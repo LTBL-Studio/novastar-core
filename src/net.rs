@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::{io::Error, net::UdpSocket};
 use tokio::time::Duration;
 
