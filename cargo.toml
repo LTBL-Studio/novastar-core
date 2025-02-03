@@ -1,0 +1,11 @@
+[package]
+name = "novastar-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serialport = "~4.7.0"
+socket2 = "~0.5.8"
+tokio = { version = "1.43.0", features = ["full"] }
+chrono = "~0.4.39"
+num_enum = "0.7.3"
