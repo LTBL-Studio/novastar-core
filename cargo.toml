@@ -2,6 +2,10 @@
 name = "novastar-core"
 version = "0.1.0"
 edition = "2021"
+license = "Apache-2.0"
+description = "Rust library for interacting with Novastar LED Screen processors"
+repository = "https://github.com/joele89/novastar-core"
+readme = "README.md"
 
 [dependencies]
 serialport = "~4.7.0"
