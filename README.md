@@ -1,5 +1,5 @@
 # Rust library for Novastar LED Screen processors
-Contains the core functions for interacting with Novastar processors
+Contains the core functions for interacting with Novastar LED Screen processors
 
 Note only the following functions have been implemented so far;
 - Set global brightness
