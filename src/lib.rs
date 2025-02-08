@@ -2,7 +2,7 @@ mod novastarpacket;
 mod controller;
 mod net;
 mod types;
-use std::{thread::sleep, time::Duration};
+use std::{io::Error, thread::sleep, time::Duration};
 use novastarpacket::{build_tx_sender, NovastarPacket};
 use types::{FeatureAddress, OpCode};
 
@@ -45,42 +45,52 @@ fn com_discover() {
                 println!("{port_name}");
                   match get_controller(port_name.to_string()) {
                     Some(_) => println!("Port Already Associated"),
-                    None => {
-                      let _ = match serialport::new(port_name, 1048576).open() {
-                        Ok(mut port) => {
-                            let _ = port.set_timeout(Duration::from_secs(1));
-                            let mut data: Vec<u8> = Vec::new();
-                            data.push(0);
-                            data.push(0);
-                            let tx_buff = build_tx_sender(OpCode::Read, 0x00, FeatureAddress::ControllerModelIdAddr, data);
-                            match port.write(&tx_buff) {
-                              Ok(_) => {
-                                let _ = port.flush();
-                                let rx_buff: &mut [u8; 22] = &mut [0; 22];
-                                match port.read_exact(rx_buff) {
-                                  Ok(_) => {
-                                    match NovastarPacket::decode(rx_buff.to_vec()) {
-                                      Ok(np) => {
-                                        let dev_id = u16::from_le_bytes([np.data[0], np.data[1]]);
-                                        add_serial_controller(port_name.to_string(),dev_id, port);
-                                      },
-                                      Err(_np) => println!("Not Novastar Hardware"),
-                                    };
-                                  },
-                                  Err(e) => println!("Serial Read Error {e}"),
-                                }
-                              },
-                              Err(e) => println!("Failed to write to serial {e}"),
-                            }
-                        },
-                        Err(e) => println!("Serial Open Failed {e}"),
-                      };
+                    None => { 
+                      match try_com_connect(port_name, 1048576) {
+                        Ok(_) => (),
+                        Err(_) => {
+                          let _ = try_com_connect(port_name, 115200);
+                        }
+                      } 
                     },
                 };
             }
         },
         Err(e) => println!("Failed to discover ports {e}"),
     };
+}
+
+fn try_com_connect(port_name: &str, baud_rate: u32) -> Result<(), Error> {
+  let _ = match serialport::new(port_name, baud_rate).open() {
+    Ok(mut port) => {
+        let _ = port.set_timeout(Duration::from_secs(1));
+        let mut data: Vec<u8> = Vec::new();
+        data.push(0);
+        data.push(0);
+        let tx_buff = build_tx_sender(OpCode::Read, 0x00, FeatureAddress::ControllerModelIdAddr, data);
+        match port.write(&tx_buff) {
+          Ok(_) => {
+            let _ = port.flush();
+            let rx_buff: &mut [u8; 22] = &mut [0; 22];
+            match port.read_exact(rx_buff) {
+              Ok(_) => {
+                match NovastarPacket::decode(rx_buff.to_vec()) {
+                  Ok(np) => {
+                    let dev_id = u16::from_le_bytes([np.data[0], np.data[1]]);
+                    add_serial_controller(port_name.to_string(),dev_id, port);
+                  },
+                  Err(_np) => println!("Not Novastar Hardware"),
+                };
+              },
+              Err(e) => { println!("Serial Read Error {e}"); return Err(e); },
+            }
+          },
+          Err(e) => println!("Failed to write to serial {e}"),
+        }
+    },
+    Err(e) => println!("Serial Open Failed {e}"),
+  };
+  return Ok(());
 }
 
 
