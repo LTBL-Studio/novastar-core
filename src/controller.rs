@@ -16,7 +16,7 @@ static mut CONTROLLERS: Vec<Controller> = Vec::new();
 pub struct Controller {
   pub port_name: String,
   pub socket: Option<std::net::SocketAddr>,
-  pub model_id: u16,
+  pub model_id: SenderCardType,
   serial_port: Option<Box<dyn SerialPort>>,
   //pub last_seen: chrono::DateTime<Utc>,
 }
@@ -116,7 +116,7 @@ pub fn get_controllers() -> &'static mut Vec<Controller> {
 pub fn get_controller(port_name: String) -> Option<&'static Controller> {
     unsafe { return CONTROLLERS.iter().find(|r| r.port_name == port_name).map(|v| v); }
 }
-pub fn add_serial_controller(port_name: String, device_model: u16, serial_port: Box<dyn SerialPort>) {
+pub fn add_serial_controller(port_name: String, device_model: SenderCardType, serial_port: Box<dyn SerialPort>) {
     unsafe { CONTROLLERS.push(Controller{
         port_name: port_name,
         socket: None,

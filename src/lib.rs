@@ -4,7 +4,8 @@ mod net;
 mod types;
 use std::{io::Error, thread::sleep, time::Duration};
 use novastarpacket::{build_tx_sender, NovastarPacket};
-use types::{FeatureAddress, OpCode};
+use num_enum::TryFromPrimitive;
+use types::{FeatureAddress, OpCode, SenderCardType};
 
 use crate::controller::*;
 
@@ -20,10 +21,6 @@ async fn discover_loop() {
     sleep(Duration::from_secs(30));
   }
 }
-/*
-pub fn get_controllers() -> Vec<&Controller> {
-  return controller::get_controllers();
-}*/
 
 pub fn get_controllers() -> &'static mut Vec<Controller> {
   return controller::get_controllers();
@@ -76,8 +73,17 @@ fn try_com_connect(port_name: &str, baud_rate: u32) -> Result<(), Error> {
               Ok(_) => {
                 match NovastarPacket::decode(rx_buff.to_vec()) {
                   Ok(np) => {
-                    let dev_id = u16::from_le_bytes([np.data[0], np.data[1]]);
-                    add_serial_controller(port_name.to_string(),dev_id, port);
+                    let dev_id: u16 = u16::from_le_bytes([np.data[0], np.data[1]]);
+                    let dev_model = match SenderCardType::try_from_primitive(dev_id) {
+                      Ok(r) => r,
+                      Err(_) => SenderCardType::Unknown,
+                    };
+                    println!("Found {} Controller", dev_model.to_string());
+                    if dev_model == SenderCardType::Unknown {
+                      println!("Controller Returned Model ID {}", dev_id);
+                    }
+                    add_serial_controller(port_name.to_string(), dev_model, port);
+                    return Ok(());
                   },
                   Err(_np) => println!("Not Novastar Hardware"),
                 };
@@ -90,6 +96,8 @@ fn try_com_connect(port_name: &str, baud_rate: u32) -> Result<(), Error> {
     },
     Err(e) => println!("Serial Open Failed {e}"),
   };
+  //We want to discard the port after most serial error conditions, so
+  //Default return OK and we won't trigger imediate retry
   return Ok(());
 }
 
