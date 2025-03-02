@@ -6,6 +6,7 @@ use std::{io::Error, thread::sleep, time::Duration};
 use novastarpacket::{build_tx_sender, NovastarPacket};
 use num_enum::TryFromPrimitive;
 use types::{FeatureAddress, OpCode, SenderCardType};
+use debug_print::{debug_print, debug_println};
 
 use crate::controller::*;
 
@@ -27,11 +28,11 @@ pub fn get_controllers() -> &'static mut Vec<Controller> {
 }
 
 fn print_bytes(prefix: &str, buf: &[u8]) {
-  print!("{prefix} Content: ");
+  debug_print!("{prefix} Content: ");
   for i in buf {
-      print!("{:01$x} ", i, 2);
+      debug_print!("{:01$x} ", i, 2);
   }
-  println!();
+  debug_println!();
 }
 
 fn com_discover() {
@@ -39,7 +40,6 @@ fn com_discover() {
         Ok(ports) => {
             for port_info in ports {
                 let port_name = port_info.port_name.as_str();
-                println!("{port_name}");
                   match get_controller(port_name.to_string()) {
                     Some(_) => println!("Port Already Associated"),
                     None => { 
@@ -78,7 +78,7 @@ fn try_com_connect(port_name: &str, baud_rate: u32) -> Result<(), Error> {
                       Ok(r) => r,
                       Err(_) => SenderCardType::Unknown,
                     };
-                    println!("Found {} Controller", dev_model.to_string());
+                    println!("Found {} Controller on {}", dev_model.to_string(), port_name);
                     if dev_model == SenderCardType::Unknown {
                       println!("Controller Returned Model ID {}", dev_id);
                     }
@@ -94,7 +94,7 @@ fn try_com_connect(port_name: &str, baud_rate: u32) -> Result<(), Error> {
           Err(e) => println!("Failed to write to serial {e}"),
         }
     },
-    Err(e) => println!("Serial Open Failed {e}"),
+    Err(e) => println!("{port_name} Serial Open Failed {e}"),
   };
   //We want to discard the port after most serial error conditions, so
   //Default return OK and we won't trigger imediate retry

@@ -1,6 +1,6 @@
 [package]
 name = "novastar-core"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
 description = "Rust library for interacting with Novastar LED Screen processors"
@@ -15,6 +15,7 @@ chrono = "~0.4.39"
 num_enum = "0.7.3"
 strum = "0.27.1"
 strum_macros = "0.27.1"
+debug_print = "1.0.0"
 
 [[test]]
 name = "tests"

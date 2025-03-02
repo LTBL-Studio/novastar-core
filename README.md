@@ -3,11 +3,11 @@ Contains the core functions for interacting with Novastar LED Screen processors
 
 Note only the following functions have been implemented so far;
 - Set global brightness
+- Convert hardware names from presented IDs
 
-
-todo
+highest priority todo
 - Implement NET interface
-
+- Test cascaded controllers on serial 
 
 ### Usage
 ```
