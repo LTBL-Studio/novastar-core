@@ -1,108 +1,108 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use strum_macros::Display;
 
-#[derive(PartialEq, Clone, Copy, Debug)]
-#[derive(TryFromPrimitive, IntoPrimitive)]
-#[repr(u32)] 
+#[derive(PartialEq, Clone, Copy, Debug, TryFromPrimitive, IntoPrimitive)]
+#[repr(u32)]
 pub enum FeatureAddress {
+    GlobalBrightnessOccupancy = 1,
     ControllerModelIdAddr = 0x0000_0002,
     GlobalBrightnessAddr = 0x0200_0001,
+    GammaAddr = 0x200_019B,
+    SenderGlobalBrightnessArrayAddr = 0x0A00_00A0,
 }
 
-#[derive(PartialEq, Clone, Copy, Debug)]
-#[derive(TryFromPrimitive, IntoPrimitive)]
-#[repr(u8)] 
+#[derive(PartialEq, Clone, Copy, Debug, TryFromPrimitive, IntoPrimitive)]
+#[repr(u8)]
 pub enum OpCode {
     Read = 0,
     Write = 1,
 }
 
-#[derive(PartialEq, Clone, Copy, Debug)]
-#[derive(TryFromPrimitive, IntoPrimitive)]
-#[repr(u8)] 
+#[derive(PartialEq, Clone, Copy, Debug, TryFromPrimitive, IntoPrimitive)]
+#[repr(u8)]
 pub enum DeviceType {
     Controller,
     Scanboard,
 }
 
 #[allow(non_camel_case_types)]
-#[derive(PartialEq, Clone, Copy, Debug)]
-#[derive(TryFromPrimitive, IntoPrimitive)]
-#[derive(Display)]
+#[derive(PartialEq, Clone, Copy, Debug, TryFromPrimitive, IntoPrimitive, Display)]
 #[repr(u16)]
 pub enum SenderCardType {
     MCTRL300 = 0x0001,
     MCTRL500 = 0x0101,
-    #[strum(to_string="MCTRL600/660")]
+    #[strum(to_string = "MCTRL600/660")]
     MCTRL600_660 = 0x1101,
-    #[strum(to_string="MCTRL660 Pro")]
+    #[strum(to_string = "MCTRL4K")]
+    MCTRL4K = 0x1103,
+    #[strum(to_string = "MCTRL660 Pro")]
     MCTRL660_Pro = 0x1107,
-    #[strum(to_string="MCTRL660 ROE")]
+    #[strum(to_string = "MCTRL660 ROE")]
     MCTRL660_ROE = 0x1108,
     MCTRL2000 = 0x1115,
     GT4000 = 0x1180,
-    #[strum(to_string="MP8-JF")]
+    #[strum(to_string = "MP8-JF")]
     MP8_JF = 0x1307,
     E510 = 0x1308,
     KT16_ZM = 0x130C,
-    #[strum(to_string="FTSC4000-E")]
+    #[strum(to_string = "FTSC4000-E")]
     FTSC4000_E = 0x130E,
     Empty = 0x2101,
-    #[strum(to_string="K4S-N")]
+    #[strum(to_string = "K4S-N")]
     K4S_N = 0x6129,
-    #[strum(to_string="VX4S-N")]
+    #[strum(to_string = "VX4S-N")]
     VX4S_N = 0x612A,
-    #[strum(to_string="NovaPro UHD Jr")]
+    #[strum(to_string = "NovaPro UHD Jr")]
     NovaProUHD_Jr = 0x6205,
-    #[strum(to_string="4K-Prime")]
+    #[strum(to_string = "4K-Prime")]
     Prime_4K = 0x6209,
-    #[strum(to_string="DS-D43V32")]
+    #[strum(to_string = "DS-D43V32")]
     DS_D43V32 = 0x6210,
-    #[strum(to_string="VC6 Pro")]
+    #[strum(to_string = "VC6 Pro")]
     VC6Pro = 0x6227,
-    #[strum(to_string="VC10 Pro")]
+    #[strum(to_string = "VC10 Pro")]
     VC10Pro = 0x6228,
-    #[strum(to_string="VX400 Pro")]
+    #[strum(to_string = "VX400 Pro")]
     VX400Pro = 0x6229,
-    #[strum(to_string="VX600 Pro")]
+    #[strum(to_string = "VX600 Pro")]
     VX600Pro = 0x622A,
-    #[strum(to_string="VX1000 Pro")]
+    #[strum(to_string = "VX1000 Pro")]
     VX1000Pro = 0x622B,
-    #[strum(to_string="VX2000 Pro")]
+    #[strum(to_string = "VX2000 Pro")]
     VX2000Pro = 0x622C,
-    #[strum(to_string="VX200s-N")]
+    #[strum(to_string = "VX200s-N")]
     VX200s_N = 0x622D,
     J6 = 0x7104,
-    #[strum(to_string="DP 4K 1-3")]
+    #[strum(to_string = "DP 4K 1-3")]
     DP_4K_1_3 = 0x7204,
-    #[strum(to_string="NovaPro UHD")]
+    #[strum(to_string = "NovaPro UHD")]
     NovaProUHD = 0x7504,
-    #[strum(to_string="E8000")]
+    #[strum(to_string = "E8000")]
     E8000_1 = 0x7505,
-    #[strum(to_string="E8000")]
+    #[strum(to_string = "E8000")]
     E8000_2 = 0x7647,
-    #[strum(to_string="E8000")]
+    #[strum(to_string = "E8000")]
     E8000_3 = 0x7648,
-    #[strum(to_string="H Series")]
+    #[strum(to_string = "H Series")]
     H_series_H9 = 0x7b46,
-    #[strum(to_string="H Series")]
+    #[strum(to_string = "H Series")]
     H_series_H20 = 0x7b48,
-    #[strum(to_string="Planar Series")]
+    #[strum(to_string = "Planar Series")]
     Planar = 0x8101,
-    #[strum(to_string="Planar Series")]
+    #[strum(to_string = "Planar Series")]
     H20_Planar = 0x9048,
     MCTRL700 = 0x9101,
-    #[strum(to_string="DS-D40T02-N")]
+    #[strum(to_string = "DS-D40T02-N")]
     DS_D40T02_N = 0x9622,
-    #[strum(to_string="DS-D43T02-N")]
+    #[strum(to_string = "DS-D43T02-N")]
     DS_D43T02_N = 0x9623,
-    #[strum(to_string="DS-D40T04-N")]
+    #[strum(to_string = "DS-D40T04-N")]
     DS_D40T04_N = 0x9624,
-    #[strum(to_string="DS-D43T04-N")]
+    #[strum(to_string = "DS-D43T04-N")]
     DS_D43T04_N = 0x9625,
-    #[strum(to_string="DS-D40T01")]
+    #[strum(to_string = "DS-D40T01")]
     DS_D40T01 = 0x9626,
-    #[strum(to_string="DS-D43T01")]
+    #[strum(to_string = "DS-D43T01")]
     DS_D43T01 = 0x9627,
     Unknown = 0xFFFF,
 }

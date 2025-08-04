@@ -6,23 +6,20 @@ Note only the following functions have been implemented so far;
 - Convert hardware names from presented IDs
 
 highest priority todo
-- Implement NET interface
-- Test cascaded controllers on serial 
+- Test cascaded controllers on serial
+- Test brightness getter on more controllers
 
 ### Usage
 ```
 use novastar_core;
 
 novastar_core::discover();
-let controllers = novastar_core::get_controllers();
 
-for i in 0..255 {
-    if controllers.len() > 0 {
-        for controller in controllers {
-            controller.set_brightness(i);
-        }
-    }
-    sleep(1);
+if let Ok(controllers) = net::discover() {
+  for mut controller in controllers {
+    println!("Hosts {controller:?}");
+    controller.set_brightness(128).unwrap()
+  }
 }
 
 ```
