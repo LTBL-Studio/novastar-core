@@ -1,9 +1,12 @@
+use num_enum::TryFromPrimitive;
 use serialport::SerialPort;
 use std::fmt::Display;
+use std::io;
 use std::io::Read;
 use std::io::Write;
 use std::net::SocketAddr;
 use std::net::TcpStream;
+use std::time::Duration;
 use thiserror::Error;
 
 use crate::novastarpacket::*;
@@ -19,6 +22,8 @@ pub enum Error {
     Flush(std::io::Error),
     #[error("invalid packet: {0}")]
     PacketDecoding(#[from] PacketError),
+    #[error("Failed to connect: {0}")]
+    Connection(io::Error)
 }
 
 #[derive(Debug)]
@@ -107,6 +112,41 @@ impl Controller {
             &[0],
         ))
         .map_err(Error::Write)
+    }
+
+    /// Tries to connect to a Novastar [Controller] on the provided [SocketAddr]
+    pub fn try_from_tcp_addr(addr: SocketAddr) -> Result<Self, Error> {
+        let mut stream = TcpStream::connect(addr).map_err(Error::Connection)?;
+        stream.set_read_timeout(Some(Duration::from_secs(1))).map_err(Error::Connection)?;
+        let tx_buff = build_tx_sender(
+            OpCode::Read,
+            0x00,
+            FeatureAddress::ControllerModelIdAddr,
+            &[0, 0],
+        );
+
+        stream.write_all(&tx_buff).map_err(Error::Write)?;
+        stream.flush().map_err(Error::Flush)?;
+        let rx_buff: &mut [u8; 22] = &mut [0; 22];
+        stream.read_exact(rx_buff).map_err(Error::Read)?;
+
+        let packet = NovastarPacket::decode(rx_buff)?;
+
+        let dev_id: u16 = u16::from_le_bytes([packet.data[0], packet.data[1]]);
+        
+        let dev_model =
+            SenderCardType::try_from_primitive(dev_id).unwrap_or(SenderCardType::Unknown);
+            
+        #[cfg(feature = "debug")]
+        if dev_model == SenderCardType::Unknown {
+            println!("Controller returned model ID {dev_id}");
+            println!("{:01$x} ", dev_id, 2);
+        }
+
+        Ok(Self {
+            card_type: dev_model,
+            connexion: crate::ConnexionType::Tcp(addr, stream),
+        })
     }
 }
 
