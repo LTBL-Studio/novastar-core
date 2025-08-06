@@ -8,7 +8,7 @@ mod controller;
 mod novastarpacket;
 mod types;
 
-use crate::controller::*;
+pub use crate::controller::*;
 
 /// Returns an Iterator over the Novastar [Controller]s available on the network and on serial ports of the machine
 ///
